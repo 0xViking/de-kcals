@@ -1,6 +1,6 @@
 import "../styles/globals.css"
 import Head from "next/head"
-import { Mainui } from "../components/Mainui"
+import Mainui from "../components/Mainui"
 import Layout from "../components/Layout"
 import { NotificationProvider } from "web3uikit"
 function MyApp({ Component, pageProps }) {

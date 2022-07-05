@@ -3,8 +3,9 @@ import { Orbis } from "@orbisclub/orbis-sdk"
 import { useEffect, useState } from "react"
 import Mainui from "./Mainui"
 
+let orbis = new Orbis()
+
 export default function CreateConversation() {
-    let orbis = new Orbis()
     const [storedUser, setStoredUser] = useState("")
     const [users, setUsers] = useState([])
     const [loading, setLoading] = useState(false)
@@ -126,6 +127,7 @@ export default function CreateConversation() {
     return (
         <div>
             {getForm()}
+            {/* Adding MainUI to check if the error exists even without reloading the page  */}
             <Mainui />
         </div>
     )
