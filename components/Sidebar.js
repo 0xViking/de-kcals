@@ -1,10 +1,12 @@
 import Link from "next/link"
 import { Fragment, useState } from "react"
 import { Dialog, Transition } from "@headlessui/react"
-import { HomeIcon, MenuIcon, XIcon, ViewGridIcon } from "@heroicons/react/outline"
+import { ViewGridAddIcon, MenuIcon, XIcon, ViewGridIcon } from "@heroicons/react/outline"
 
 // Sidebar menu items(Navigation Object)
-const navigation = [{ name: "Home", href: "/", icon: HomeIcon, current: true }]
+const navigation = [
+    { name: "Create Conversation", href: "/", icon: ViewGridAddIcon, current: true },
+]
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(" ")
@@ -67,7 +69,7 @@ export default function Sidebar() {
                                                 className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
                                                 onClick={() => setSidebarOpen(false)}
                                             >
-                                                <span className="sr-only">Close sidebar</span>
+                                                <div className="sr-only">Close sidebar</div>
                                                 <XIcon
                                                     className="h-6 w-6 text-white"
                                                     aria-hidden="true"
@@ -163,7 +165,7 @@ export default function Sidebar() {
                             className="-ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
                             onClick={() => setSidebarOpen(true)}
                         >
-                            <span className="sr-only">Open sidebar</span>
+                            <div className="sr-only">Open sidebar</div>
                             <MenuIcon className="h-6 w-6" aria-hidden="true" />
                         </button>
                     </div>

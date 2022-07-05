@@ -1,9 +1,9 @@
-import Mainui from "../components/Mainui"
+import CreateConversation from "../components/CreateConversation"
 
 export default function Home() {
     return (
         <div>
-            <Mainui />
+            <CreateConversation />
         </div>
     )
 }

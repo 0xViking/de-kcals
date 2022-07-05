@@ -1,9 +1,13 @@
 import "../styles/globals.css"
 import Head from "next/head"
-import { MoralisProvider } from "react-moralis"
+import { Mainui } from "../components/Mainui"
 import Layout from "../components/Layout"
 import { NotificationProvider } from "web3uikit"
 function MyApp({ Component, pageProps }) {
+    let storedUser
+    if (typeof window !== "undefined") {
+        storedUser = window.localStorage.getItem("Kcals-globalUser")
+    }
     return (
         <div>
             <Head>
@@ -12,12 +16,15 @@ function MyApp({ Component, pageProps }) {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            {/* Layout style to show Sidebar and Header in every view */}
-            <NotificationProvider>
-                <Layout>
-                    <Component {...pageProps} />
-                </Layout>
-            </NotificationProvider>
+            {storedUser ? (
+                <NotificationProvider>
+                    <Layout>
+                        <Component {...pageProps} />
+                    </Layout>
+                </NotificationProvider>
+            ) : (
+                <Mainui />
+            )}
         </div>
     )
 }

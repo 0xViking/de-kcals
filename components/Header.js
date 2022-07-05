@@ -1,27 +1,13 @@
-import { useState } from "react"
 import { Button } from "web3uikit"
-import { Orbis } from "@orbisclub/orbis-sdk"
 import Image from "next/image"
 
 export default function Header() {
-    const [user, setUser] = useState()
-    const [userName, setUserName] = useState()
-    const [pfp, setPFP] = useState()
+    let storedUser, storedUserName, storedPFP
 
-    const orbis = new Orbis()
-
-    const connectOrbis = async () => {
-        let res = await orbis.connect()
-
-        /** Check if connection is successful or not */
-        if (res.status == 200) {
-            setUser(res.did)
-            res.details.profile.username && setUserName(res.details.profile.username)
-            res.details.profile.pfp && setPFP(res.details.profile.pfp)
-        } else {
-            console.log("Error connecting to Ceramic: ", res)
-            alert("Error connecting to Ceramic.")
-        }
+    if (typeof window !== "undefined") {
+        storedUser = window.localStorage.getItem("Kcals-globalUser")
+        storedUserName = window.localStorage.getItem("Kcals-globalUserName")
+        storedPFP = window.localStorage.getItem("Kcals-globalPFP")
     }
 
     return (
@@ -32,34 +18,34 @@ export default function Header() {
                 <div className="pt-1 text-stone-700 font-bold flex justify-start">
                     DE-KCALS : decentralized slack powered by Orbis
                 </div>
-                {user ? (
-                    <p className="flex pt-1">
-                        {userName ? (
-                            <a href={`https://cerscan.com/mainnet/profile/${user}`} target="_blank">
-                                <p className="text-stone-700 font-bold hover:underline hover:text-red-400">
-                                    {" " + userName}
-                                </p>
-                            </a>
-                        ) : (
-                            <a href={`https://cerscan.com/mainnet/profile/${user}`} target="_blank">
-                                <p className="text-stone-700 font-bold">
-                                    {" " + user.slice(17, 22)}...{user.slice(user.length - 4)}
-                                </p>
-                            </a>
+
+                <div className="flex pt-1">
+                    {storedUserName ? (
+                        <a
+                            href={`https://cerscan.com/mainnet/profile/${storedUser}`}
+                            target="_blank"
+                        >
+                            <div className="text-stone-700 font-bold hover:underline hover:text-red-400">
+                                {" " + storedUserName}
+                            </div>
+                        </a>
+                    ) : (
+                        <a
+                            href={`https://cerscan.com/mainnet/profile/${storedUser}`}
+                            target="_blank"
+                        >
+                            <div className="text-stone-700 font-bold">
+                                {" " + storedUser.slice(17, 22)}...
+                                {storedUser.slice(storedUser.length - 4)}
+                            </div>
+                        </a>
+                    )}
+                    <div className="pl-2">
+                        {storedPFP && (
+                            <Image src={storedPFP} alt="DE-KCALS logo" width={30} height={30} />
                         )}
-                        <span>
-                            {pfp && <Image src={pfp} alt="DE-KCALS logo" width={30} height={30} />}
-                        </span>
-                    </p>
-                ) : (
-                    <Button
-                        id="connect-button"
-                        onClick={connectOrbis}
-                        text="Connect"
-                        theme="primary"
-                        type="button"
-                    />
-                )}
+                    </div>
+                </div>
             </div>
         </div>
     )
