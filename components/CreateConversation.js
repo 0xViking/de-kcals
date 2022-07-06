@@ -1,7 +1,7 @@
-import { Form } from "web3uikit"
+import { Form, Button } from "web3uikit"
 import { Orbis } from "@orbisclub/orbis-sdk"
 import { useEffect, useState } from "react"
-import Mainui from "./Mainui"
+import { globalUser, globalUserName, globalPFP } from "../pages/GlobalUser"
 
 let orbis = new Orbis()
 
@@ -9,8 +9,11 @@ export default function CreateConversation() {
     const [storedUser, setStoredUser] = useState("")
     const [users, setUsers] = useState([])
     const [loading, setLoading] = useState(false)
+    const [isConnecting, setIsConnecting] = useState(false)
+    const [btnDisabled, setBtnDisabled] = useState(false)
 
     const btnConfig = {
+        isDisabled: btnDisabled,
         isLoading: loading,
         loadingText: "Creating",
         text: "Create",
@@ -50,6 +53,9 @@ export default function CreateConversation() {
                         inputWidth: "100%",
                         name: "Name",
                         type: "text",
+                        validation: {
+                            required: true,
+                        },
                         value: "",
                     },
                     {
@@ -72,13 +78,15 @@ export default function CreateConversation() {
     }
 
     const onSubmit = async (dataObject) => {
+        setBtnDisabled(true)
         const data = dataObject.data
         console.log(data)
         setLoading(true)
-        const recipientDIDs = [storedUser]
+        const recipientDIDs = []
         if (data[2].inputResult === "Add atleast 1 member") {
             alert("Please add atleast 1 member")
             setLoading(false)
+            setBtnDisabled(false)
             return
         }
         data &&
@@ -98,10 +106,38 @@ export default function CreateConversation() {
         createConversation(reqObj)
     }
 
+    const connectOrbis = async () => {
+        setIsConnecting(true)
+        let res = await orbis.connect()
+
+        /** Check if connection is successful or not */
+        if (res.status == 200) {
+            globalUser = res.did
+            if (typeof window !== "undefined") {
+                window.localStorage.setItem("Kcals-globalUser", globalUser)
+            }
+            if (res.details.profile.username) {
+                globalUserName = res.details.profile.username
+                if (typeof window !== "undefined") {
+                    window.localStorage.setItem("Kcals-globalUserName", globalUserName)
+                }
+            }
+            if (res.details.profile.pfp) {
+                globalPFP = res.details.profile.pfp
+                if (typeof window !== "undefined") {
+                    window.localStorage.setItem("Kcals-globalPFP", globalPFP)
+                }
+            }
+            setIsConnecting(false)
+        } else {
+            console.log("Error connecting to Ceramic: ", res)
+            alert("Error connecting to Ceramic.")
+            setIsConnecting(false)
+        }
+    }
+
     /** We are calling the Orbis SDK to create a NEW conversation */
     async function createConversation(object) {
-        setLoading(true)
-
         /**
          * The createConversation() function accept a JSON object that must contain a `recipients` object
          * which is an array containing all of the `dids` that will be part of the conversation. The sender's
@@ -112,12 +148,13 @@ export default function CreateConversation() {
         /** Check if conversation was created with success or not */
         if (res.status == 200) {
             console.log("Save this conversation_id to use in the following examples: ", res.doc)
-            alert("Save this conversation_id to use in the following examples: " + res.doc)
+            // alert("Save this conversation_id to use in the following examples: " + res.doc)
         } else {
             console.log("Error creating conversation: ", res)
             alert("Error creating conversation.")
         }
         setLoading(false)
+        setBtnDisabled(false)
     }
 
     useEffect(() => {
@@ -125,10 +162,22 @@ export default function CreateConversation() {
     }, [])
 
     return (
-        <div>
-            {getForm()}
-            {/* Adding MainUI to check if the error exists even without reloading the page  */}
-            <Mainui />
-        </div>
+        <>
+            <div>
+                <div className="flex justify-start p-2">
+                    <Button
+                        id="connect-button"
+                        onClick={connectOrbis}
+                        size="large"
+                        isLoading={isConnecting}
+                        loadingText="Connecting..."
+                        text="Connect Wallet"
+                        theme="primary"
+                        type="button"
+                    />
+                </div>
+                {getForm()}
+            </div>
+        </>
     )
 }

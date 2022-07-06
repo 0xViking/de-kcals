@@ -7,7 +7,7 @@ export default function Layout({ children }) {
             <Header />
             <div className="flex flex-col-2">
                 <Sidebar />
-                <div className="p-4">{children}</div>
+                <div>{children}</div>
             </div>
         </div>
     )

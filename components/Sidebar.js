@@ -1,27 +1,74 @@
 import Link from "next/link"
-import { Fragment, useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 import { Dialog, Transition } from "@headlessui/react"
-import { ViewGridAddIcon, MenuIcon, XIcon, ViewGridIcon } from "@heroicons/react/outline"
+import {
+    ViewGridAddIcon,
+    MenuIcon,
+    XIcon,
+    ViewGridIcon,
+    HashtagIcon,
+} from "@heroicons/react/outline"
+import { Orbis } from "@orbisclub/orbis-sdk"
+import { globalUser, globalUserName, globalPFP } from "../pages/GlobalUser"
 
-// Sidebar menu items(Navigation Object)
-const navigation = [
-    { name: "Create Conversation", href: "/", icon: ViewGridAddIcon, current: true },
-]
-
-function classNames(...classes) {
-    return classes.filter(Boolean).join(" ")
-}
-
-//Function to change the current varibale in the Navigation object
-function changeCurrent(navigation, current) {
-    navigation.map((item) =>
-        item.name === current ? (item.current = true) : (item.current = false)
-    )
-}
+let orbis = new Orbis()
 
 export default function Sidebar() {
     /* react state variable to know the sidebar status */
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [loading, setLoading] = useState(true)
+    const [conversations, setConversations] = useState([])
+    const [navigation, setNavigation] = useState([])
+
+    function classNames(...classes) {
+        return classes.filter(Boolean).join(" ")
+    }
+
+    //Function to change the current varibale in the Navigation object
+    function changeCurrent(navigation, current) {
+        navigation.map((item) =>
+            item.name === current ? (item.current = true) : (item.current = false)
+        )
+    }
+
+    const setNavigationTab = (navData) => {
+        let navi = [
+            { name: "Create Conversation", href: "/", icon: ViewGridAddIcon, current: true },
+        ]
+        navData.map((item) => {
+            navi.push({
+                name: item.details.content.name && item.details.content.name,
+                href: "/conversations/" + item.stream_id,
+                icon: HashtagIcon,
+                current: false,
+            })
+        })
+        setNavigation(navi)
+        console.log("Whole Navigation", navigation)
+        console.log("only Navi", navi)
+    }
+
+    const getConversations = async () => {
+        setLoading(true)
+        const reqObj = {
+            did: globalUser,
+            context: "viking_team",
+        }
+        let { data, error, status } = await orbis.getConversations(reqObj)
+
+        if (data) {
+            setConversations(data)
+            setLoading(false)
+            console.log(data)
+            setNavigationTab(data)
+        } else if (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        getConversations()
+    }, [globalUser])
 
     return (
         <>
@@ -126,31 +173,35 @@ export default function Sidebar() {
                             <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
                                 {/* Sidebar Navigation in Desktop view */}
                                 <nav className="mt-10 flex-1 pt-1 px-2 bg-white space-y-1">
-                                    {navigation.map((item) => (
-                                        <Link key={item.name} href={item.href} passHref>
-                                            <a
-                                                key={item.name}
-                                                onClick={() => changeCurrent(navigation, item.name)}
-                                                className={classNames(
-                                                    item.current
-                                                        ? "bg-gray-100 text-gray-900"
-                                                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
-                                                    "group flex items-center px-2 py-2 text-sm font-medium rounded-md"
-                                                )}
-                                            >
-                                                <item.icon
+                                    {navigation &&
+                                        navigation.length > 0 &&
+                                        navigation.map((item) => (
+                                            <Link key={item.name} href={item.href} passHref>
+                                                <a
+                                                    key={item.name}
+                                                    onClick={() =>
+                                                        changeCurrent(navigation, item.name)
+                                                    }
                                                     className={classNames(
                                                         item.current
-                                                            ? "text-gray-500"
-                                                            : "text-gray-400 group-hover:text-gray-500",
-                                                        "mr-3 flex-shrink-0 h-6 w-6"
+                                                            ? "bg-gray-100 text-gray-900"
+                                                            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+                                                        "group flex items-center px-2 py-2 text-sm font-medium rounded-md"
                                                     )}
-                                                    aria-hidden="true"
-                                                />
-                                                {item.name}
-                                            </a>
-                                        </Link>
-                                    ))}
+                                                >
+                                                    <item.icon
+                                                        className={classNames(
+                                                            item.current
+                                                                ? "text-gray-500"
+                                                                : "text-gray-400 group-hover:text-gray-500",
+                                                            "mr-3 flex-shrink-0 h-6 w-6"
+                                                        )}
+                                                        aria-hidden="true"
+                                                    />
+                                                    {item.name}
+                                                </a>
+                                            </Link>
+                                        ))}
                                 </nav>
                             </div>
                         </div>
