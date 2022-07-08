@@ -6,12 +6,12 @@ import { globalUser, globalUserName, globalPFP } from "../pages/GlobalUser"
 let orbis = new Orbis()
 
 export default function CreateConversation() {
-    const [storedUser, setStoredUser] = useState("")
     const [users, setUsers] = useState([])
     const [loading, setLoading] = useState(false)
     const [isConnecting, setIsConnecting] = useState(false)
     const [btnDisabled, setBtnDisabled] = useState(false)
 
+    /** Button related configurations for the form */
     const btnConfig = {
         isDisabled: btnDisabled,
         isLoading: loading,
@@ -20,16 +20,17 @@ export default function CreateConversation() {
         theme: "primary",
     }
 
+    /** User DID's we already have */
     const userDids = {
         Baptiste: "did:pkh:eip155:1:0x075286d1a22b083ebcaf6b7fb4cf970cfc4a18f0",
         Charles: "did:pkh:eip155:1:0x9fd07f4ee4f18e27f9d958fb42e8ea2e6ee547bd",
         VikingTest: "did:pkh:eip155:1:0x7c9ae227a21cc5a940eb8616ef21a5bf706acce6",
     }
 
+    /** Displays the users to add to the conversation while creating */
     const getUsers = () => {
         if (typeof window !== "undefined") {
             const localStoredUser = window.localStorage.getItem("Kcals-globalUser")
-            setStoredUser(localStoredUser)
             if (localStoredUser === userDids.Baptiste) {
                 setUsers(["Charles", "VikingTest"])
             } else if (localStoredUser === userDids.Charles) {
@@ -42,6 +43,7 @@ export default function CreateConversation() {
         }
     }
 
+    /** Return the Form styled component powered by web3uikit*/
     const getForm = () => {
         return (
             <Form
@@ -77,10 +79,10 @@ export default function CreateConversation() {
         )
     }
 
+    /** When the form is submitted, we are creating a request object and call the Orbis SDK to create a new conversation */
     const onSubmit = async (dataObject) => {
         setBtnDisabled(true)
         const data = dataObject.data
-        console.log(data)
         setLoading(true)
         const recipientDIDs = []
         if (data[2].inputResult === "Add atleast 1 member") {
@@ -106,6 +108,7 @@ export default function CreateConversation() {
         createConversation(reqObj)
     }
 
+    /** Connecting to Orbis functionality */
     const connectOrbis = async () => {
         setIsConnecting(true)
         let res = await orbis.connect()
@@ -138,17 +141,11 @@ export default function CreateConversation() {
 
     /** We are calling the Orbis SDK to create a NEW conversation */
     async function createConversation(object) {
-        /**
-         * The createConversation() function accept a JSON object that must contain a `recipients` object
-         * which is an array containing all of the `dids` that will be part of the conversation. The sender's
-         * `did` will be added automatically.
-         */
         let res = await orbis.createConversation(object)
 
         /** Check if conversation was created with success or not */
         if (res.status == 200) {
             console.log("Save this conversation_id to use in the following examples: ", res.doc)
-            // alert("Save this conversation_id to use in the following examples: " + res.doc)
         } else {
             console.log("Error creating conversation: ", res)
             alert("Error creating conversation.")
@@ -157,6 +154,7 @@ export default function CreateConversation() {
         setBtnDisabled(false)
     }
 
+    /** When the component is mounted, we are trying to fetch what users to display on screen depending on the locally stored user DID */
     useEffect(() => {
         getUsers()
     }, [])
@@ -164,6 +162,7 @@ export default function CreateConversation() {
     return (
         <>
             <div>
+                {/* Connect wallet button */}
                 <div className="flex justify-start p-2">
                     <Button
                         id="connect-button"
@@ -176,6 +175,7 @@ export default function CreateConversation() {
                         type="button"
                     />
                 </div>
+                {/* Create conversation form */}
                 {getForm()}
             </div>
         </>

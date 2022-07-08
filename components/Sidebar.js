@@ -24,7 +24,7 @@ export default function Sidebar() {
         return classes.filter(Boolean).join(" ")
     }
 
-    //Function to change the current varibale in the Navigation object
+    /** Function to change the current varibale in the Navigation object */
     function changeCurrent(navigation, current) {
         navigation.map((item) =>
             item.name === current ? (item.current = true) : (item.current = false)
@@ -48,6 +48,7 @@ export default function Sidebar() {
         console.log("only Navi", navi)
     }
 
+    /** Fetches all the conversations of a user specific to "viking_team" context */
     const getConversations = async () => {
         setLoading(true)
         const reqObj = {

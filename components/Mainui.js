@@ -9,6 +9,7 @@ const orbis = new Orbis()
 export default function Mainui() {
     const [isConnecting, setIsConnecting] = useState(false)
 
+    /** Connecting to Orbis functionality */
     const connectOrbis = async () => {
         setIsConnecting(true)
         let res = await orbis.connect()
@@ -43,6 +44,7 @@ export default function Mainui() {
     return (
         <>
             <div className="grid place-items-center h-screen bg-zinc-50">
+                {/* UI which shows on the MAIN screen if there is no locally stored USER DID found */}
                 <div className="p-28 text-center bg-white border rounded-lg drop-shadow-xl text-stone-700 font-bold">
                     <div className="object-contain mb-10">
                         <Image src="/updated.png" alt="DE-KCALS logo" width={120} height={100} />

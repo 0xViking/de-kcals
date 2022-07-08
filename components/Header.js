@@ -1,4 +1,3 @@
-import { Button } from "web3uikit"
 import Image from "next/image"
 
 export default function Header() {
@@ -11,8 +10,8 @@ export default function Header() {
     }
 
     return (
-        /** Header of the page which has the logo and connect wallet button */
         <div className="sticky top-0 z-10 bg-white p-2 shadow">
+            {/* Header of the page which has the logo and connect wallet button */}
             <div className="flex justify-between">
                 <Image src="/updated.png" alt="DE-KCALS logo" width={50} height={40} />
                 <div className="pt-1 text-stone-700 font-bold flex justify-start">
